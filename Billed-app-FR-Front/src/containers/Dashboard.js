@@ -95,13 +95,24 @@ export default class {
   };
 
   handleEditTicket(e, bill, bills) {
-    console.log("toto");
-    if (this.counter === undefined || this.id !== bill.id) this.counter = 0;
-    if (this.id === undefined || this.id !== bill.id) this.id = bill.id;
+    console.log(this.id, bill.id, this.counter);
+    // SI le compteur est à undefined OU l'id du ticket cliqué n'est pas égal à l'id de la facture
+    // ALORS compteur à 0
+    if (this.counter === undefined || this.id !== bill.id) {
+      this.counter = 0;
+    }
+
+    // SI l'id du ticket cliqué est à undefined OU l'id du ticket cliqué n'est pas égal à l'id de la facture
+    // ALORS l'id du ticket cliqué est égal à l'id de la facture
+    if (this.id === undefined || this.id !== bill.id) {
+      this.id = bill.id;
+    }
+
+    // SI le compteur est pair
     if (this.counter % 2 === 0) {
-      console.log(bills);
-      bills.forEach((b) => {
-        $(`#open-bill${b.id}`).css({ background: "#0D5AE5" });
+      bills.forEach((bill) => {
+        //ajout du bleu
+        $(`#open-bill${bill.id}`).css({ background: "#0D5AE5" });
       });
       $(`#open-bill${bill.id}`).css({ background: "#2A2B35" });
       $(".dashboard-right-container div").html(DashboardFormUI(bill));
@@ -109,13 +120,13 @@ export default class {
       this.counter++;
     } else {
       $(`#open-bill${bill.id}`).css({ background: "#0D5AE5" });
-
       $(".dashboard-right-container div").html(`
         <div id="big-billed-icon" data-testid="big-billed-icon"> ${BigBilledIcon} </div>
       `);
       $(".vertical-navbar").css({ height: "120vh" });
       this.counter++;
     }
+
     $("#icon-eye-d").click(this.handleClickIconEye);
     $("#btn-accept-bill").click((e) => this.handleAcceptSubmit(e, bill));
     $("#btn-refuse-bill").click((e) => this.handleRefuseSubmit(e, bill));
@@ -156,7 +167,9 @@ export default class {
       this.counter++;
     }
 
-    bills.forEach((bill) => {
+    // has changed bills by filteredBills(bills, getStatus(this.index));
+    // ne prend pas en compte toutes les bills mais les bills filtrées
+    filteredBills(bills, getStatus(this.index)).forEach((bill) => {
       $(`#open-bill${bill.id}`).click((e) =>
         this.handleEditTicket(e, bill, bills)
       );
