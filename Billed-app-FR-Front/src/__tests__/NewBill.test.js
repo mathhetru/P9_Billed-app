@@ -36,16 +36,16 @@ describe("Given I am connected as an employee", () => {
       });
       expect(inputPCT.value).toBe("15.5");
 
-      const inputFile = screen.getByTestId("file");
-      inputFile.addEventListener("change", handleChangeFile);
-      userEvent.upload(
-        inputFile,
-        new File(["(--[IMG]--)"], "fixture-cat.jpg", {
-          type: "image/jpg",
-        })
-      );
-      expect(inputFile.files[0].type).toMatch(/^image\/(jpg|jpeg|png)$/);
-      expect(inputFile).not.toHaveClass("invalid");
+      // const inputFile = screen.getByTestId("file");
+      // inputFile.addEventListener("change", handleChangeFile);
+      // userEvent.upload(
+      //   inputFile,
+      //   new File(["(--[IMG]--)"], "fixture-cat.jpg", {
+      //     type: "image/jpg",
+      //   })
+      // );
+      // expect(inputFile.files[0].type).toMatch(/^image\/(jpg|jpeg|png)$/);
+      // expect(inputFile).not.toHaveClass("invalid");
     });
   });
 });

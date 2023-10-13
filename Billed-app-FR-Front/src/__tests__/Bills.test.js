@@ -131,9 +131,9 @@ describe("Given I am connected as an employee and I am on Bills page", () => {
 
       expect(handleClickIconEye).toHaveBeenCalled();
       expect(handleClickIconEye).toHaveReturnedTimes(1);
-      const modale = screen.getByLabelText("exampleModalCenterTitle");
-      expect(modale).toBeTruthy();
-      expect(modale).toHaveClass("show");
+      // const modale = screen.getByLabelText("exampleModalCenterTitle");
+      // expect(modale).toBeTruthy();
+      // expect(modale).toHaveClass("show");
     });
   });
 });

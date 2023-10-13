@@ -27,6 +27,37 @@ describe("Given that I am a user on login page", () => {
     });
   });
 
+  describe("And login fails", () => {
+    test("Then It should create employee and renders Login page", async () => {
+      // Given
+      const login = new Login({
+        document,
+        localStorage: { setItem: jest.fn() },
+        onNavigate: jest.fn(),
+      });
+      const e = {
+        preventDefault: jest.fn(),
+        target: {
+          querySelector: jest.fn().mockImplementation((param) => {
+            if (param === `input[data-testid="employee-email-input"]`) {
+              return { value: "test@toto.com" };
+            }
+            return { value: "azerty123" };
+          }),
+        },
+      };
+      jest.spyOn(login, "login").mockImplementation(() => Promise.reject());
+      jest.spyOn(login, "createUser");
+
+      // When
+      await login.handleSubmitEmployee(e);
+
+      // Then
+      expect(login.createUser).toHaveBeenCalled();
+      expect(screen.getByTestId("form-employee")).toBeTruthy();
+    });
+  });
+
   describe("When I do fill fields in incorrect format and I click on employee button Login In", () => {
     test("Then It should renders Login page", () => {
       document.body.innerHTML = LoginUI();
@@ -134,6 +165,37 @@ describe("Given that I am a user on login page", () => {
       form.addEventListener("submit", handleSubmit);
       fireEvent.submit(form);
       expect(screen.getByTestId("form-admin")).toBeTruthy();
+    });
+
+    describe("And login fails", () => {
+      test("Then It should create admin and renders Login page", async () => {
+        // Given
+        const login = new Login({
+          document,
+          localStorage: { setItem: jest.fn() },
+          onNavigate: jest.fn(),
+        });
+        const e = {
+          preventDefault: jest.fn(),
+          target: {
+            querySelector: jest.fn().mockImplementation((param) => {
+              if (param === `input[data-testid="employee-email-input"]`) {
+                return { value: "test@toto.com" };
+              }
+              return { value: "azerty123" };
+            }),
+          },
+        };
+        jest.spyOn(login, "login").mockImplementation(() => Promise.reject());
+        jest.spyOn(login, "createUser");
+
+        // When
+        await login.handleSubmitAdmin(e);
+
+        // Then
+        expect(login.createUser).toHaveBeenCalled();
+        expect(screen.getByTestId("form-employee")).toBeTruthy();
+      });
     });
   });
 

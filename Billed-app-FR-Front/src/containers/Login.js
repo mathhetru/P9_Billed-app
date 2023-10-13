@@ -36,7 +36,7 @@ export default class Login {
       status: "connected",
     };
     this.localStorage.setItem("user", JSON.stringify(user));
-    this.login(user)
+    return this.login(user)
       .catch((err) => this.createUser(user))
       .then(() => {
         this.onNavigate(ROUTES_PATH["Bills"]);
@@ -58,7 +58,7 @@ export default class Login {
       status: "connected",
     };
     this.localStorage.setItem("user", JSON.stringify(user));
-    this.login(user)
+    return this.login(user)
       .catch((err) => this.createUser(user))
       .then(() => {
         this.onNavigate(ROUTES_PATH["Dashboard"]);
@@ -66,13 +66,6 @@ export default class Login {
         PREVIOUS_LOCATION = this.PREVIOUS_LOCATION;
         document.body.style.backgroundColor = "#fff";
       });
-    // .then(() => {
-    //   this.onNavigate(ROUTES_PATH["Dashboard"]);
-    //   this.PREVIOUS_LOCATION = ROUTES_PATH["Dashboard"];
-    //   PREVIOUS_LOCATION = this.PREVIOUS_LOCATION;
-    //   document.body.style.backgroundColor = "#fff";
-    // })
-    // .catch((err) => alert("Oops! Wrong email and password. Try again"));
   };
 
   // not need to cover this function by tests
