@@ -95,7 +95,6 @@ export default class {
   };
 
   handleEditTicket(e, bill, bills) {
-    console.log(this.id, bill.id, this.counter);
     // SI le compteur est à undefined OU l'id du ticket cliqué n'est pas égal à l'id de la facture
     // ALORS compteur à 0
     if (this.counter === undefined || this.id !== bill.id) {
@@ -206,7 +205,7 @@ export default class {
         .bills()
         .update({ data: JSON.stringify(bill), selector: bill.id })
         .then((bill) => bill)
-        .catch(console.log);
+        .catch(console.error);
     }
   };
 }
