@@ -189,6 +189,16 @@ describe("Given I am connected as an employee", () => {
         root.setAttribute("id", "root");
         document.body.appendChild(root);
         router();
+
+        jest.spyOn(newBillPage.document, 'querySelector').mockImplementation((selector) => {
+          // TODO un peu (return input)
+          if (selector === `input[data-testid="file"]`) {
+            const file = new File(["foo"], "foo.txt", {
+              type: "text/plain",
+            });
+            return { files: [file] }
+          }
+        })
   
         mockStore.bills.mockImplementationOnce(() => {
           return {
@@ -202,27 +212,16 @@ describe("Given I am connected as an employee", () => {
         });
         const fakeEvent = {
           preventDefault: jest.fn(),
-          target: {
-            querySelector: jest.fn().mockImplementation((selector) => {
-              if (selector === `select[data-testid="expense-type"]`) {
-                return { value: "Services en ligne" };
-              }
-              if (selector === `input[data-testid="amount"]`) {
-                return { value: 14 };
-              }
-              if (selector === `input[data-testid="datepicker"]`) {
-                return { value: "1989-05-26" };
-              }
-              if (selector === `input[data-testid="pct"]`) {
-                return { value: 20 };
-              }
-              return { value: undefined };
-            }),
-          },
+        
         };
   
         newBillPage.handleSubmit(fakeEvent);
-        expect(newBillPage.onNavigate).toHaveBeenCalledWith("#employee/bills");
+        // TODO : tester que this.store.bills().create() n'est pas appelée
+        // TODO : window.alert() a été appelé avec le bon texte 
+
+
+
+        // TODO dans un 2e test avec une bonne image : tester que this.store.bills().create() est appelée
     })
   })
 });
