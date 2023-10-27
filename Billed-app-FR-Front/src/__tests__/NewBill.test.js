@@ -82,51 +82,7 @@ describe("Given I am connected as an employee", () => {
           },
         };
       });
-      /*
-      // const inputExpenseType = screen.getAllByTestId("expense-type");
-      // fireEvent.change(inputExpenseType, {
-      //   target: { value: "Services en ligne" },
-      // });
-      fireEvent.click(screen.getAllByText("Services en ligne")[0]);
-      // expect(inputExpenseType.value).toBe("Services en ligne");
-      console.log(screen.getAllByText("Services en ligne"));
-      // expect(screen.getAllByText("Services en ligne")).toBeInTheDocument();
 
-      const inputDate = screen.getByTestId("datepicker");
-      fireEvent.change(inputDate, {
-        target: { value: "1989-05-26" },
-      });
-      expect(inputDate.value).toBe("1989-05-26");
-
-      const inputAmount = screen.getByTestId("amount");
-      fireEvent.change(inputAmount, {
-        target: { value: "380" },
-      });
-      expect(inputAmount.value).toBe("380");
-
-      const inputPCT = screen.getByTestId("pct");
-      fireEvent.change(inputPCT, {
-        target: { value: "15.5" },
-      });
-      expect(inputPCT.value).toBe("15.5");
-
-      const inputFile = screen.getByTestId("file");
-      const handleChangeFile = jest.fn(() => newBillPage.handleChangeFile());
-      inputFile.addEventListener("change", handleChangeFile);
-      const f = new File(["(--[IMG]--)"], "fixture-cat.jpg", {
-        type: "image/jpg",
-      });
-      console.log(f);
-      userEvent.upload(
-        inputFile,
-        new File(["(--[IMG]--)"], "fixture-cat.jpg", {
-          type: "image/jpg",
-        })
-      );
-      expect(inputFile.files[0].type).toMatch(/^image\/(jpg|jpeg|png)$/);
-      expect(inputFile).not.toHaveClass("invalid");
-      
-      */
       jest.spyOn(newBillPage, "onNavigate");
       newBillPage.fileUrl = "https://my-url.com/image.jpg";
       newBillPage.fileName = "image.jpg";
@@ -157,71 +113,138 @@ describe("Given I am connected as an employee", () => {
   });
 
   describe("When I am on Newbill page and I upload an invalid image format", () => {
-    test("Then it ...", () => {
-      test("Then it should open bills page", () => {
-        // init page test
-        jest.spyOn(mockStore, "bills");
-  
-        Object.defineProperty(window, "localStorage", {
-          value: localStorageMock,
-        });
-        window.localStorage.setItem(
-          "user",
-          JSON.stringify({
-            type: "Employee",
-          })
-        );
-        const onNavigate = (pathname) => {
-          document.body.innerHTML = ROUTES({ pathname });
-        };
-        document.body.innerHTML = NewBillUI({
-          data: bills,
-        });
-        const store = mockStore;
-        const newBillPage = new NewBill({
-          document,
-          onNavigate,
-          store,
-          localStorage: window.localStorage,
-        });
-  
-        const root = document.createElement("div");
-        root.setAttribute("id", "root");
-        document.body.appendChild(root);
-        router();
+    test("Then it should open an window.alert ", () => {
+      // setup / Given
+      jest.spyOn(mockStore, "bills");
 
-        jest.spyOn(newBillPage.document, 'querySelector').mockImplementation((selector) => {
-          // TODO un peu (return input)
+      Object.defineProperty(window, "localStorage", {
+        value: localStorageMock,
+      });
+      window.localStorage.setItem(
+        "user",
+        JSON.stringify({
+          type: "Employee",
+        })
+      );
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname });
+      };
+      document.body.innerHTML = NewBillUI({
+        data: bills,
+      });
+      const store = mockStore;
+      const newBillPage = new NewBill({
+        document,
+        onNavigate,
+        store,
+        localStorage: window.localStorage,
+      });
+
+      const root = document.createElement("div");
+      root.setAttribute("id", "root");
+      document.body.appendChild(root);
+      router();
+
+      jest
+        .spyOn(newBillPage.document, "querySelector")
+        .mockImplementation((selector) => {
           if (selector === `input[data-testid="file"]`) {
             const file = new File(["foo"], "foo.txt", {
               type: "text/plain",
             });
-            return { files: [file] }
+            return { files: [file] };
           }
-        })
-  
-        mockStore.bills.mockImplementationOnce(() => {
-          return {
-            create: () => {
-              return Promise.resolve({
-                fileUrl: "https://localhost:3456/images/test.jpg",
-                key: "1234",
-              });
-            },
-          };
         });
-        const fakeEvent = {
-          preventDefault: jest.fn(),
-        
+
+      mockStore.bills.mockImplementationOnce(() => {
+        return {
+          create: () => {
+            return Promise.resolve({
+              fileUrl: "https://localhost:3456/images/test.jpg",
+              key: "1234",
+            });
+          },
         };
-  
-        newBillPage.handleSubmit(fakeEvent);
-        // TODO : tester que this.store.bills().create() n'est pas appelée
-        // TODO : window.alert() a été appelé avec le bon texte 
+      });
+      const fakeEvent = {
+        preventDefault: jest.fn(),
+      };
 
+      jest.spyOn(window, "alert").mockImplementation(() => {});
 
+      // When / action
+      newBillPage.handleChangeFile(fakeEvent);
 
-        // TODO dans un 2e test avec une bonne image : tester que this.store.bills().create() est appelée
-    })
-  })
+      // Then / ce que je veux tester
+      expect(window.alert).toHaveBeenCalledWith(
+        "Vous devez ajouter un fichier .jpg ou .jpeg ou .png"
+      );
+      expect(newBillPage.store.bills).not.toHaveBeenCalled();
+    });
+    // TODO dans un 2e test avec une bonne image : tester que this.store.bills().create() est appelée
+  });
+
+  describe("When I am on Newbill page and I upload an valid image format", () => {
+    test("Then it should create the bills", () => {
+      // init page test
+      jest.spyOn(mockStore, "bills");
+
+      Object.defineProperty(window, "localStorage", {
+        value: localStorageMock,
+      });
+      window.localStorage.setItem(
+        "user",
+        JSON.stringify({
+          type: "Employee",
+        })
+      );
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname });
+      };
+      jest.spyOn(document, "querySelector").mockImplementation((selector) => {
+        if (selector === `form[data-testid="form-new-bill"]`) {
+          return document.createElement("form");
+        }
+
+        if (selector === `input[data-testid="file"]`) {
+          const file = new File(["foo"], "foo.jpg", {
+            type: "image/jpeg",
+          });
+          return { files: [file], addEventListener: jest.fn() };
+        }
+      });
+      document.body.innerHTML = NewBillUI({
+        data: bills,
+      });
+      const store = mockStore;
+      const newBillPage = new NewBill({
+        document,
+        onNavigate,
+        store,
+        localStorage: window.localStorage,
+      });
+
+      const root = document.createElement("div");
+      root.setAttribute("id", "root");
+      document.body.appendChild(root);
+      router();
+
+      mockStore.bills.mockImplementationOnce(() => {
+        return {
+          create: () => {
+            return Promise.resolve({
+              fileUrl: "https://localhost:3456/images/test.jpg",
+              key: "1234",
+            });
+          },
+        };
+      });
+      const fakeEvent = {
+        preventDefault: jest.fn(),
+      };
+
+      newBillPage.handleChangeFile(fakeEvent);
+      expect(newBillPage.store.bills).toHaveBeenCalled();
+    });
+  });
 });
