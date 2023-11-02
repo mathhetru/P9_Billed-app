@@ -340,20 +340,20 @@ describe("Given I am a user connected as Employee", () => {
         expect(message).toBeTruthy();
       });
 
-      //     test("fetches messages from an API and fails with 500 message error", async () => {
-      //       mockStore.bills.mockImplementationOnce(() => {
-      //         return {
-      //           list: () => {
-      //             return Promise.reject(new Error("Erreur 500"));
-      //           },
-      //         };
-      //       });
+      test("fetches messages from an API and fails with 500 message error", async () => {
+        mockStore.bills.mockImplementationOnce(() => {
+          return {
+            create: (bill) => {
+              return Promise.reject(new Error("Erreur 404"));
+            },
+          };
+        });
 
-      //       window.onNavigate(ROUTES_PATH.Bills);
-      //       await new Promise(process.nextTick);
-      //       const message = await screen.getByText(/Erreur 500/);
-      //       expect(message).toBeTruthy();
-      //     });
+        window.onNavigate(ROUTES_PATH.NewBill);
+        await new Promise(process.nextTick);
+        const message = await screen.getByText(/Erreur 500/);
+        expect(message).toBeTruthy();
+      });
     });
   });
 });
