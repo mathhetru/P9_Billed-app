@@ -19,19 +19,26 @@ export default class NewBill {
   }
   handleChangeFile = (e) => {
     e.preventDefault();
+    // ajout de l'input
     const input = this.document.querySelector(`input[data-testid="file"]`);
     const file = this.document.querySelector(`input[data-testid="file"]`)
       .files[0];
     const fileName = file.name;
+    // on récupère l'extension du fichier envoyé
     const filesWord = fileName.split(".");
     const lastWord = filesWord[filesWord.length - 1];
     const formData = new FormData();
     const email = JSON.parse(localStorage.getItem("user")).email;
+    // on crée un array d'extensions de fichier autorisés
     const formatsAutorises = ["jpg", "jpeg", "png"];
+    // SI l'extension du fichier envoyé ne fait pas parti de la liste d'extension autorisé
     if (!formatsAutorises.includes(lastWord)) {
+      // alert window
       alert("Vous devez ajouter un fichier .jpg ou .jpeg ou .png");
+      // on retourne la valeur de l'input à null
       return (input.value = null);
     } else {
+      // sinon on envoie la facture avec le fichier 
       formData.append("file", file);
       formData.append("email", email);
       this.store

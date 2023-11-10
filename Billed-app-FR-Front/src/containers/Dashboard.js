@@ -172,7 +172,7 @@ export default class {
       this.counter++;
     }
 
-    //! has changed bills by filteredBills(bills, getStatus(this.index));
+    //! has changed bills.forEach... by filteredBills(bills, getStatus(this.index)).forEach...
     // prenait en compte toutes les bills alors qu'il fallait les bills filtrées
     filteredBills(bills, getStatus(this.index)).forEach((bill) => {
       $(`#open-bill${bill.id}`).click((e) =>
