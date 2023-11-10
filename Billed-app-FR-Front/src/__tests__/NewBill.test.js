@@ -18,7 +18,9 @@ jest.mock("../app/store", () => mockStore);
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
+    // TEST : ajout du test de l'icone newbill en surbrillance
     test("Then newbill icon in vertical layout should be highlighted", async () => {
+      //initialization
       Object.defineProperty(window, "localStorage", {
         value: localStorageMock,
       });
@@ -40,10 +42,13 @@ describe("Given I am connected as an employee", () => {
   });
 
   describe("When I am on NewBill Page and I filled all required inputs and add a jpg", () => {
+    // TEST : ajout du test de l'ouverture de la page bills lors de la complétion du formulaire
     test("Then it should open bills page", () => {
       // init page test
+      // mock de données bills
       jest.spyOn(mockStore, "bills");
 
+      // definie le localstorage
       Object.defineProperty(window, "localStorage", {
         value: localStorageMock,
       });
@@ -53,24 +58,22 @@ describe("Given I am connected as an employee", () => {
           type: "Employee",
         })
       );
+      // declare onNavigate
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname });
       };
+      // met en place le body via NewBillUI
       document.body.innerHTML = NewBillUI({
         data: bills,
       });
       const store = null;
+
       const newBillPage = new NewBill({
         document,
         onNavigate,
         store,
         localStorage: window.localStorage,
       });
-
-      const root = document.createElement("div");
-      root.setAttribute("id", "root");
-      document.body.appendChild(root);
-      router();
 
       mockStore.bills.mockImplementationOnce(() => {
         return {
