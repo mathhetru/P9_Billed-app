@@ -4,6 +4,7 @@
 
 import { screen, waitFor } from "@testing-library/dom";
 import NewBillUI from "../views/NewBillUI.js";
+import BillsUI from "../views/BillsUI.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
 import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
 import NewBill from "../containers/NewBill.js";
@@ -250,7 +251,10 @@ describe("Given I am connected as an employee", () => {
 // test d'intégration POST
 describe("Given I am a user connected as Employee", () => {
   describe("When I navigate to NewBill page", () => {
-    test("should POST a new bill", async () => {
+    let fakeEvent;
+    let newBillPage;
+
+    beforeEach(() => {
       localStorage.setItem(
         "user",
         JSON.stringify({ type: "Employee", email: "a@a" })
@@ -262,8 +266,20 @@ describe("Given I am a user connected as Employee", () => {
       document.body.innerHTML = NewBillUI({
         data: bills,
       });
-      const store = null;
-      const newBillPage = new NewBill({
+      const store = {
+        bills: jest.fn().mockImplementation(() => {
+          return {
+            create: () => {
+              return Promise.resolve({
+                fileUrl: "https://localhost:3456/images/test.jpg",
+                key: "1234",
+              });
+            },
+            update: () => Promise.resolve(),
+          };
+        }),
+      };
+      newBillPage = new NewBill({
         document,
         onNavigate,
         store,
@@ -277,7 +293,7 @@ describe("Given I am a user connected as Employee", () => {
 
       newBillPage.fileUrl = "https://my-url.com/image.jpg";
       newBillPage.fileName = "image.jpg";
-      const fakeEvent = {
+      fakeEvent = {
         preventDefault: jest.fn(),
         target: {
           querySelector: jest.fn().mockImplementation((selector) => {
@@ -300,7 +316,10 @@ describe("Given I am a user connected as Employee", () => {
           }),
         },
       };
+    });
 
+    test("should POST a new bill", async () => {
+      newBillPage.handleChangeFile(fakeEvent);
       newBillPage.handleSubmit(fakeEvent);
 
       await waitFor(() => screen.getByText("Mes notes de frais"));
@@ -308,49 +327,33 @@ describe("Given I am a user connected as Employee", () => {
       expect(contentPending).toBeTruthy();
       expect(screen.getByTestId("btn-new-bill")).toBeTruthy();
     });
-    describe("When an error occurs on API", () => {
-      beforeEach(() => {
-        jest.spyOn(mockStore, "bills");
-        Object.defineProperty(window, "localStorage", {
-          value: localStorageMock,
-        });
-        window.localStorage.setItem(
-          "user",
-          JSON.stringify({
-            type: "Employee",
-            email: "a@a",
-          })
-        );
-        const root = document.createElement("div");
-        root.setAttribute("id", "root");
-        document.body.appendChild(root);
-        router();
-      });
-      test("fetches bills from an API and fails with 404 message error", async () => {
-        mockStore.bills.mockImplementationOnce(() => {
+
+    describe("When I submit the form and there's an error with the server", () => {
+      //erreur 404
+      test("Then there is a mistake and it fails with 404 error message", async () => {
+        mockStore.bills(() => {
           return {
-            create: (bill) => {
+            list: () => {
               return Promise.reject(new Error("Erreur 404"));
             },
           };
         });
-        window.onNavigate(ROUTES_PATH.NewBill);
-        await new Promise(process.nextTick);
+        const html = BillsUI({ error: "Erreur 404" });
+        document.body.innerHTML = html;
         const message = await screen.getByText(/Erreur 404/);
         expect(message).toBeTruthy();
       });
-
-      test("fetches messages from an API and fails with 500 message error", async () => {
-        mockStore.bills.mockImplementationOnce(() => {
+      //erreur 500
+      test("Then there is a mistake and it fails with 500 error message", async () => {
+        mockStore.bills(() => {
           return {
-            create: (bill) => {
-              return Promise.reject(new Error("Erreur 404"));
+            list: () => {
+              return Promise.reject(new Error("Erreur 500"));
             },
           };
         });
-
-        window.onNavigate(ROUTES_PATH.NewBill);
-        await new Promise(process.nextTick);
+        const html = BillsUI({ error: "Erreur 500" });
+        document.body.innerHTML = html;
         const message = await screen.getByText(/Erreur 500/);
         expect(message).toBeTruthy();
       });

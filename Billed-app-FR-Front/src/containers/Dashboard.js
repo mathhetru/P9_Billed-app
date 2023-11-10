@@ -95,22 +95,16 @@ export default class {
   };
 
   handleEditTicket(e, bill, bills) {
-    // SI le compteur est à undefined OU l'id du ticket cliqué n'est pas égal à l'id de la facture
-    // ALORS compteur à 0
     if (this.counter === undefined || this.id !== bill.id) {
       this.counter = 0;
     }
 
-    // SI l'id du ticket cliqué est à undefined OU l'id du ticket cliqué n'est pas égal à l'id de la facture
-    // ALORS l'id du ticket cliqué est égal à l'id de la facture
     if (this.id === undefined || this.id !== bill.id) {
       this.id = bill.id;
     }
 
-    // SI le compteur est pair
     if (this.counter % 2 === 0) {
       bills.forEach((bill) => {
-        //ajout du bleu
         $(`#open-bill${bill.id}`).css({ background: "#0D5AE5" });
       });
       $(`#open-bill${bill.id}`).css({ background: "#2A2B35" });
@@ -152,22 +146,34 @@ export default class {
   };
 
   handleShowTickets(e, bills, index) {
+    // SI le compteur est à undefined OU l'id du ticket cliqué n'est pas égal à l'id de la facture
+    // ALORS compteur à 0
     if (this.counter === undefined || this.index !== index) this.counter = 0;
+    console.log(bills, index, this.index, this.counter);
+
+    // SI l'id du ticket cliqué est à undefined OU l'id du ticket cliqué n'est pas égal à l'id de la facture
+    // ALORS l'id du ticket cliqué est égal à l'id de la facture
     if (this.index === undefined || this.index !== index) this.index = index;
+
+    // SI le compteur est pair
     if (this.counter % 2 === 0) {
+      //rotation de la fleche à 0deg (la liste se plie)
       $(`#arrow-icon${this.index}`).css({ transform: "rotate(0deg)" });
       $(`#status-bills-container${this.index}`).html(
         cards(filteredBills(bills, getStatus(this.index)))
       );
+      //incrementation du compteur pour qu'il devienne impair
       this.counter++;
     } else {
+      //rotation de la fleche à 90deg (la liste se déplie)
       $(`#arrow-icon${this.index}`).css({ transform: "rotate(90deg)" });
       $(`#status-bills-container${this.index}`).html("");
+      //incrementation du compteur pour qu'il devienne pair
       this.counter++;
     }
 
-    // has changed bills by filteredBills(bills, getStatus(this.index));
-    // ne prend pas en compte toutes les bills mais les bills filtrées
+    //! has changed bills by filteredBills(bills, getStatus(this.index));
+    // prenait en compte toutes les bills alors qu'il fallait les bills filtrées
     filteredBills(bills, getStatus(this.index)).forEach((bill) => {
       $(`#open-bill${bill.id}`).click((e) =>
         this.handleEditTicket(e, bill, bills)
