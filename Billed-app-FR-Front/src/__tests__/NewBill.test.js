@@ -21,6 +21,7 @@ describe("Given I am connected as an employee", () => {
     // TEST : ajout du test de l'icone newbill en surbrillance
     test("Then newbill icon in vertical layout should be highlighted", async () => {
       //initialization
+      // definie le localstorage
       Object.defineProperty(window, "localStorage", {
         value: localStorageMock,
       });
@@ -30,13 +31,18 @@ describe("Given I am connected as an employee", () => {
           type: "Employee",
         })
       );
+      // met en place le body de la page
       const root = document.createElement("div");
       root.setAttribute("id", "root");
       document.body.append(root);
+      // appelle le router()
       router();
+      // on navigue sur la page newBill
       window.onNavigate(ROUTES_PATH.NewBill);
+      // on attend que l'icone a testé soit mise en place
       await waitFor(() => screen.getByTestId("icon-mail"));
       const windowIcon = screen.getByTestId("icon-mail");
+      // expect que l'icone a la class "active-icon"
       expect(windowIcon).toHaveClass("active-icon");
     });
   });
@@ -45,7 +51,7 @@ describe("Given I am connected as an employee", () => {
     // TEST : ajout du test de l'ouverture de la page bills lors de la complétion du formulaire
     test("Then it should open bills page", () => {
       // init page test
-      // mock de données bills
+      // on écoute la fonction bills() de mockSotre
       jest.spyOn(mockStore, "bills");
 
       // definie le localstorage
@@ -66,15 +72,16 @@ describe("Given I am connected as an employee", () => {
       document.body.innerHTML = NewBillUI({
         data: bills,
       });
+      // déclare le store
       const store = null;
-
+      // déclare la function NewBill pour la page
       const newBillPage = new NewBill({
         document,
         onNavigate,
         store,
         localStorage: window.localStorage,
       });
-
+      // implémente la function create() avec un return en resolve
       mockStore.bills.mockImplementationOnce(() => {
         return {
           create: () => {
@@ -86,9 +93,11 @@ describe("Given I am connected as an employee", () => {
         };
       });
 
+      // on écoute la function onNavigate de newBillPage
       jest.spyOn(newBillPage, "onNavigate");
       newBillPage.fileUrl = "https://my-url.com/image.jpg";
       newBillPage.fileName = "image.jpg";
+      // déclare un evenement fake avec ce dont on a besoin pour faire le test
       const fakeEvent = {
         preventDefault: jest.fn(),
         target: {
@@ -110,7 +119,9 @@ describe("Given I am connected as an employee", () => {
         },
       };
 
+      // on appelle la function handleSubmit en lui passant l'evenement fake
       newBillPage.handleSubmit(fakeEvent);
+      // expect que l'on passe à la page Bills car la function onNavigate() a été appelé
       expect(newBillPage.onNavigate).toHaveBeenCalledWith("#employee/bills");
     });
   });
@@ -118,8 +129,6 @@ describe("Given I am connected as an employee", () => {
   describe("When I am on Newbill page and I upload an invalid image format", () => {
     test("Then it should open an window.alert ", () => {
       // setup / Given
-      jest.spyOn(mockStore, "bills");
-
       Object.defineProperty(window, "localStorage", {
         value: localStorageMock,
       });
@@ -142,11 +151,6 @@ describe("Given I am connected as an employee", () => {
         store,
         localStorage: window.localStorage,
       });
-
-      const root = document.createElement("div");
-      root.setAttribute("id", "root");
-      document.body.appendChild(root);
-      router();
 
       jest
         .spyOn(newBillPage.document, "querySelector")
@@ -175,10 +179,10 @@ describe("Given I am connected as an employee", () => {
 
       jest.spyOn(window, "alert").mockImplementation(() => {});
 
-      // When / action
+      // When handleChangeFile(fakeEvent)
       newBillPage.handleChangeFile(fakeEvent);
 
-      // Then / ce que je veux tester
+      // Then alert has been called with the expected text
       expect(window.alert).toHaveBeenCalledWith(
         "Vous devez ajouter un fichier .jpg ou .jpeg ou .png"
       );
@@ -189,8 +193,6 @@ describe("Given I am connected as an employee", () => {
   describe("When I am on Newbill page and I upload an valid image format", () => {
     test("Then it should create the bills", () => {
       // init page test
-      jest.spyOn(mockStore, "bills");
-
       Object.defineProperty(window, "localStorage", {
         value: localStorageMock,
       });
@@ -225,11 +227,6 @@ describe("Given I am connected as an employee", () => {
         store,
         localStorage: window.localStorage,
       });
-
-      const root = document.createElement("div");
-      root.setAttribute("id", "root");
-      document.body.appendChild(root);
-      router();
 
       mockStore.bills.mockImplementationOnce(() => {
         return {
@@ -288,11 +285,6 @@ describe("Given I am a user connected as Employee", () => {
         store,
         localStorage: window.localStorage,
       });
-
-      const root = document.createElement("div");
-      root.setAttribute("id", "root");
-      document.body.appendChild(root);
-      router();
 
       newBillPage.fileUrl = "https://my-url.com/image.jpg";
       newBillPage.fileName = "image.jpg";

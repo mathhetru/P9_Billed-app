@@ -5,7 +5,6 @@
 import { screen, waitFor } from "@testing-library/dom";
 import userEvent from "@testing-library/user-event";
 import BillsUI from "../views/BillsUI.js";
-import Actions from "../views/Actions.js";
 import { bills } from "../fixtures/bills.js";
 import Bills from "../containers/Bills.js";
 import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
@@ -36,7 +35,7 @@ describe("Given I am connected as an employee", () => {
       window.onNavigate(ROUTES_PATH.Bills);
       await waitFor(() => screen.getByTestId("icon-window"));
       const windowIcon = screen.getByTestId("icon-window");
-      //TEST : Ajout de l'expect 
+      //TEST : Ajout de l'expect
       expect(windowIcon).toHaveClass("active-icon");
     });
 
@@ -57,6 +56,8 @@ describe("Given I am connected as an employee", () => {
 describe("Given I am connected as an employee and I am on Bills page", () => {
   describe("When I click on 'nouvelle note de frais' button", () => {
     test("I should be sent on 'Envoyer une note de frais' page", () => {
+      // init page test
+      // definie le localstorage
       Object.defineProperty(window, "localStorage", {
         value: localStorageMock,
       });
@@ -66,11 +67,15 @@ describe("Given I am connected as an employee and I am on Bills page", () => {
           type: "Employee",
         })
       );
+      // met en place le body via BillsUI
       document.body.innerHTML = BillsUI({ bills });
+      // declare onNavigate
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname });
       };
+      // déclare le store
       const store = null;
+      // déclare la function Bills pour la page
       const billspage = new Bills({
         document,
         onNavigate,
@@ -79,12 +84,15 @@ describe("Given I am connected as an employee and I am on Bills page", () => {
         localStorage: window.localStorage,
       });
 
+      // on déclare la simulation de la function handleClickNewBill
       const handleClickNewBill = jest.fn(billspage.handleClickNewBill);
 
+      // on cherche le newBillButton sur la page et on écoute le click sur handleClickNewBill
       const newBillButton = screen.getByTestId("btn-new-bill");
       newBillButton.addEventListener("click", handleClickNewBill);
       userEvent.click(newBillButton);
 
+      // Au click, expect que la fonction handleClickNewBill a été appelé et que l'on est bien sur la page "envoyer une note de frais"
       expect(handleClickNewBill).toHaveBeenCalled();
       expect(screen.getByText("Envoyer une note de frais")).toBeTruthy();
     });
@@ -174,6 +182,8 @@ describe("Given I am a user connected as Employee", () => {
         document.body.appendChild(root);
         router();
       });
+
+      // Error 404
       test("fetches bills from an API and fails with 404 message error", async () => {
         mockStore.bills.mockImplementationOnce(() => {
           return {
@@ -188,6 +198,7 @@ describe("Given I am a user connected as Employee", () => {
         expect(message).toBeTruthy();
       });
 
+      // Error 500
       test("fetches messages from an API and fails with 500 message error", async () => {
         mockStore.bills.mockImplementationOnce(() => {
           return {
